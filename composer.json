@@ -1,0 +1,22 @@
+{
+    "version": "1.0.0",
+    "name": "spoob/unotis",
+    "description": "Unotis API PHP client library",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Spoob\\Unotis\\": "src/spoob/unotis"
+        }
+    },
+    "authors": [
+        {
+            "name": "SPOOBRU",
+            "email": "info@spoob.ru"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.4"
+    }
+}
