@@ -1,6 +1,6 @@
 # Unotis API PHP client library
 
-Будьте внимательны:
+### Будьте внимательны:
 
 Пользователи с бесплатным тарифом могут отправлять сообщения только на указанную при регистрации или подтверждённую почту.
 
@@ -8,11 +8,17 @@
 
 Все подробности - в нашей [документации](https://unotis.ru/documentation).
 
+## Установка:
 
-Использование же SDK предельно просто:
+`composer require spoob/unotis`
+
+## Использование:
 
 ```php
-$unotis = new Client(YOUR_TOKEN);
+$unotis = new Spoob\Unootis\Client(
+  YOUR_TOKEN, // Токен
+  1 // Версия API
+);
 
 // Просто создать сообщение в системе
 $response = $unotis->createMessage('Тема сообщения', 'Текс сообщения');

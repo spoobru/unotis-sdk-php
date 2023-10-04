@@ -8,14 +8,19 @@ use Spoob\Unotis\Interfaces\Client as iClient;
  *
  * @author SPOOB <info@spoob.ru>
  * @package Unotis
- * @version 1.0
+ * @version 1.1.0
  */
 class Client implements iClient
 {
     /**
-     * @var int
+     * @var string
      */
-    private int $version;
+    const API_URL = 'https://unotis.ru/api/';
+
+    /**
+     * @var string
+     */
+    private string $version;
 
     /**
      * @var string
@@ -32,7 +37,7 @@ class Client implements iClient
      * @param int $version
      * @param bool $use_curl
      */
-    public function __construct(string $token, int $version = 1, bool $use_curl = true)
+    public function __construct(string $token, string $version = '1', bool $use_curl = true)
     {
         $this->token = $token;
         $this->version = $version;
@@ -50,7 +55,7 @@ class Client implements iClient
      */
     public function createMessage(string $subject, string $text, string $url = null): string
     {
-        return $this->request('message', compact('subject', 'text', 'url'));
+        return $this->request('send/message', compact('subject', 'text', 'url'));
     }
 
     /**
@@ -65,7 +70,7 @@ class Client implements iClient
      */
     public function sendEmail(string $addressee, string $subject, string $text, string $url = null): string
     {
-        return $this->request('email', compact('addressee', 'subject', 'text', 'url'));
+        return $this->request('send/email', compact('addressee', 'subject', 'text', 'url'));
     }
 
     /**
@@ -79,7 +84,7 @@ class Client implements iClient
      */
     public function writeToTelegram(string $subject, string $text, string $url = null): string
     {
-        return $this->request('telegram', compact('subject', 'text', 'url'));
+        return $this->request('send/telegram', compact('subject', 'text', 'url'));
     }
 
     /**
@@ -89,7 +94,7 @@ class Client implements iClient
      */
     private function getApiUrl(string $type): string
     {
-        return 'https://unotis.ru/api/' . $type . '/v' . $this->version . '/send';
+        return self::API_URL . $type . '/v' . $this->version . '/';
     }
 
     /**
@@ -102,9 +107,10 @@ class Client implements iClient
      */
     private function request(string $type, array $data): string
     {
-        $request = new Request($this->use_curl);
         $data['token'] = $this->token;
         $url = $this->getApiUrl($type);
+
+        $request = new Request($this->use_curl);
 
         return $request->post($url, $data);
     }
