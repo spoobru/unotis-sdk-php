@@ -1,14 +1,26 @@
 <?php namespace Spoob\Unotis;
 
+use Spoob\Unotis\Bridge\Request;
+use Spoob\Unotis\Interfaces\Client as iClient;
+
 /**
+ * Unotis client
  *
+ * @author SPOOB <info@spoob.ru>
+ * @package Unotis
+ * @version 1.1.0
  */
-class Client
+class Client implements iClient
 {
     /**
-     * @var int
+     * @var string
      */
-    private int $version;
+    const API_URL = 'https://unotis.ru/api/';
+
+    /**
+     * @var string
+     */
+    private string $version;
 
     /**
      * @var string
@@ -16,13 +28,20 @@ class Client
     private string $token;
 
     /**
+     * @var bool
+     */
+    private bool $use_curl;
+
+    /**
      * @param string $token
      * @param int $version
+     * @param bool $use_curl
      */
-    public function __construct(string $token, int $version = 1)
+    public function __construct(string $token, string $version = '1', bool $use_curl = true)
     {
         $this->token = $token;
         $this->version = $version;
+        $this->use_curl = $use_curl;
     }
 
     /**
@@ -36,7 +55,7 @@ class Client
      */
     public function createMessage(string $subject, string $text, string $url = null): string
     {
-        return $this->request('message', compact('subject', 'text', 'url'));
+        return $this->request('send/message', compact('subject', 'text', 'url'));
     }
 
     /**
@@ -51,7 +70,7 @@ class Client
      */
     public function sendEmail(string $addressee, string $subject, string $text, string $url = null): string
     {
-        return $this->request('email', compact('addressee', 'subject', 'text', 'url'));
+        return $this->request('send/email', compact('addressee', 'subject', 'text', 'url'));
     }
 
     /**
@@ -65,11 +84,22 @@ class Client
      */
     public function writeToTelegram(string $subject, string $text, string $url = null): string
     {
-        return $this->request('telegram', compact('subject', 'text', 'url'));
+        return $this->request('send/telegram', compact('subject', 'text', 'url'));
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return string
+     */
+    private function getApiUrl(string $type): string
+    {
+        return self::API_URL . $type . '/v' . $this->version . '/';
     }
 
     /**
      * Raw request.
+     *
      * @param string $type
      * @param array $data
      *
@@ -78,21 +108,10 @@ class Client
     private function request(string $type, array $data): string
     {
         $data['token'] = $this->token;
+        $url = $this->getApiUrl($type);
 
-        $curl = curl_init();
+        $request = new Request($this->use_curl);
 
-        curl_setopt_array($curl, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => http_build_query($data),
-            CURLOPT_URL => 'https://unotis.ru/api/' . $type . '/v' . $this->version . '/send',
-            CURLOPT_USERAGENT => 'UNOTIS/1.0 (+https://unotis.ru/documentation))',
-        ]);
-
-        $response = curl_exec($curl);
-
-        curl_close($curl);
-
-        return $response;
+        return $request->post($url, $data);
     }
 }
