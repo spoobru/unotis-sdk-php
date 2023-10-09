@@ -94,7 +94,7 @@ class Client implements iClient
      */
     private function getApiUrl(string $type): string
     {
-        return self::API_URL . $type . '/v' . $this->version . '/';
+        return self::API_URL . 'v' . $this->version . '/' . $type;
     }
 
     /**
